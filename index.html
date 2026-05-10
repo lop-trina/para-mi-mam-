@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Carta para el Día de la Madre</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="carta-contenedor">
+        <div class="sobre" id="sobreCarta" onclick="abrirSobre()">
+            <div class="solapa"></div>
+            <div class="texto-sobre">Para mi mamá</div>
+        </div>
+
+        <div class="hoja" id="hojaCarta" aria-hidden="true">
+            <div class="marca">Carta para mamá</div>
+            <div class="texto-carta" id="textoCarta" contenteditable="true" spellcheck="false"></div>
+        </div>
+
+        <button class="boton boton-principal" id="botonPulsa" onclick="irAGaleria()">Pulsa aquí</button>
+    </div>
+
+    <script>
+        const cartaTexto = `Mamá querida,
+
+Hoy quiero abrirte mi corazón en esta carta porque eres la luz que guía cada uno de mis caminos. Desde pequeño aprendí de tu paciencia, de tu ternura y de tu fuerza silenciosa. Eres el abrazo cálido que siempre me acompaña cuando tengo miedo, y la voz que me recuerda que nunca estoy solo.
+
+Recuerdo aquellos días en que me levantabas con una sonrisa, preparabas mi desayuno y me animabas a no rendirme. Tus palabras se han quedado grabadas en mí como un tesoro: "Hazlo con amor", "sigue aunque cueste", "confía en ti". Gracias por enseñarme que los detalles pequeños son los que más importan, y por transformarlos en momentos eternos.
+
+En cada paso que doy, tu ejemplo me acompaña. Gracias por tus sacrificios, por tus noches en vela, por tus consejos sinceros y por quererme tal como soy. Esta carta es sólo una forma de decirte que te admiro, te quiero y te honro hoy y siempre.
+
+Con todo mi amor y gratitud,
+
+Tu hij@`;
+        const sobreCarta = document.getElementById('sobreCarta');
+        const hojaCarta = document.getElementById('hojaCarta');
+        const textoCarta = document.getElementById('textoCarta');
+        const botonPulsa = document.getElementById('botonPulsa');
+        let cartaMostrada = false;
+        let animando = false;
+
+        function abrirSobre() {
+            if (cartaMostrada || animando) return;
+            animando = true;
+            sobreCarta.classList.add('sobre-abierto');
+            setTimeout(() => {
+                hojaCarta.classList.add('hoja-visible');
+                escribirCarta();
+            }, 650);
+        }
+
+        function escribirCarta() {
+            textoCarta.textContent = '';
+            let i = 0;
+            const intervalo = setInterval(() => {
+                textoCarta.textContent += cartaTexto[i];
+                ajustarAltura();
+                i += 1;
+                if (i >= cartaTexto.length) {
+                    clearInterval(intervalo);
+                    cartaMostrada = true;
+                    animando = false;
+                }
+            }, 20);
+        }
+
+        function irAGaleria() {
+            window.location.href = 'galeria.html';
+        }
+
+        function ajustarAltura() {
+            textoCarta.style.height = 'auto';
+            textoCarta.style.height = textoCarta.scrollHeight + 'px';
+        }
+
+        function vibrarBoton() {
+            botonPulsa.classList.add('boton-vibrar');
+            setTimeout(() => botonPulsa.classList.remove('boton-vibrar'), 250);
+        }
+
+        botonPulsa.addEventListener('click', vibrarBoton);
+        textoCarta.addEventListener('input', ajustarAltura);
+        window.addEventListener('load', ajustarAltura);
+    </script>
+</body>
+</html>

@@ -1,0 +1,132 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Galería de Fotos - Día de la Madre</title>
+    <link rel="stylesheet" href="galeria.css">
+</head>
+<body>
+    <div class="contenedor-galeria">
+        <a href="index.html" class="boton-volver">← Volver</a>
+
+        <div class="galeria-grid">
+            <div class="lado lado-izquierdo">
+                <div class="miniatura" data-index="0">
+                    <img src="https://via.placeholder.com/180x140/FF69B4/FFFFFF?text=1" alt="Miniatura 1">
+                </div>
+                <div class="miniatura" data-index="1">
+                    <img src="https://via.placeholder.com/180x140/FFB6C1/FFFFFF?text=2" alt="Miniatura 2">
+                </div>
+                <div class="miniatura" data-index="2">
+                    <img src="https://via.placeholder.com/180x140/FFC0CB/FFFFFF?text=3" alt="Miniatura 3">
+                </div>
+            </div>
+
+            <div class="imagen-principal" id="imagenPrincipal">
+                <img id="imagenPrincipalImg" src="https://via.placeholder.com/500x400/FF69B4/FFFFFF?text=Foto+1" alt="Imagen principal">
+                <div class="mensaje-tactil">Desliza con el dedo para girar y cambiar la imagen</div>
+            </div>
+
+            <div class="lado lado-derecho">
+                <div class="miniatura" data-index="3">
+                    <img src="https://via.placeholder.com/180x140/FFE4E1/FFFFFF?text=4" alt="Miniatura 4">
+                </div>
+                <div class="miniatura" data-index="4">
+                    <img src="https://via.placeholder.com/180x140/E91E63/FFFFFF?text=5" alt="Miniatura 5">
+                </div>
+                <div class="miniatura" data-index="5">
+                    <img src="https://via.placeholder.com/180x140/C2185B/FFFFFF?text=6" alt="Miniatura 6">
+                </div>
+            </div>
+        </div>
+
+        <div class="audio-panel">
+            <button id="botonAudio" class="boton-audio">Activar audio</button>
+            <p>La música suena cuando cambias la imagen con el dedo.</p>
+        </div>
+    </div>
+
+    <script>
+        const imagenes = [
+            'https://via.placeholder.com/500x400/FF69B4/FFFFFF?text=Foto+1',
+            'https://via.placeholder.com/500x400/FFB6C1/FFFFFF?text=Foto+2',
+            'https://via.placeholder.com/500x400/FFC0CB/FFFFFF?text=Foto+3',
+            'https://via.placeholder.com/500x400/FFE4E1/FFFFFF?text=Foto+4',
+            'https://via.placeholder.com/500x400/E91E63/FFFFFF?text=Foto+5',
+            'https://via.placeholder.com/500x400/C2185B/FFFFFF?text=Foto+6'
+        ];
+        const miniaturas = document.querySelectorAll('.miniatura');
+        const imagenPrincipal = document.getElementById('imagenPrincipalImg');
+        const imagenContenedor = document.getElementById('imagenPrincipal');
+        const botonAudio = document.getElementById('botonAudio');
+        let indiceActual = 0;
+        let startX = 0;
+        let audioContext;
+
+        function actualizarImagen(nuevoIndice) {
+            indiceActual = (nuevoIndice + imagenes.length) % imagenes.length;
+            imagenPrincipal.src = imagenes[indiceActual];
+            miniaturas.forEach((mini, index) => {
+                mini.classList.toggle('activo', index === indiceActual);
+            });
+            if (audioContext) {
+                sonarNota(indiceActual);
+            }
+        }
+
+        miniaturas.forEach(mini => {
+            mini.addEventListener('click', () => {
+                actualizarImagen(Number(mini.dataset.index));
+            });
+        });
+
+        imagenContenedor.addEventListener('touchstart', e => {
+            startX = e.changedTouches[0].clientX;
+            imagenContenedor.style.transition = 'none';
+            imagenContenedor.classList.add('deslizando');
+        });
+
+        imagenContenedor.addEventListener('touchmove', e => {
+            const deltaX = e.changedTouches[0].clientX - startX;
+            imagenContenedor.style.transform = `perspective(800px) rotateY(${deltaX / 8}deg)`;
+        });
+
+        imagenContenedor.addEventListener('touchend', e => {
+            const deltaX = e.changedTouches[0].clientX - startX;
+            imagenContenedor.style.transition = 'transform 0.35s ease';
+            imagenContenedor.style.transform = 'perspective(800px) rotateY(0deg)';
+            imagenContenedor.classList.remove('deslizando');
+            if (deltaX > 40) {
+                actualizarImagen(indiceActual - 1);
+            } else if (deltaX < -40) {
+                actualizarImagen(indiceActual + 1);
+            }
+        });
+
+        function iniciarAudio() {
+            if (audioContext) return;
+            audioContext = new (window.AudioContext || window.webkitAudioContext)();
+            botonAudio.textContent = 'Audio activado';
+            sonarNota(indiceActual);
+        }
+
+        function sonarNota(posicion) {
+            if (!audioContext) return;
+            const frecuencia = 220 + posicion * 45;
+            const osc = audioContext.createOscillator();
+            const ganancia = audioContext.createGain();
+            osc.type = 'sine';
+            osc.frequency.value = frecuencia;
+            osc.connect(ganancia);
+            ganancia.connect(audioContext.destination);
+            ganancia.gain.value = 0.12;
+            osc.start();
+            osc.stop(audioContext.currentTime + 0.15);
+        }
+
+        botonAudio.addEventListener('click', iniciarAudio);
+        actualizarImagen(indiceActual);
+    </script>
+</body>
+</html>

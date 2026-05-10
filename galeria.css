@@ -45,6 +45,20 @@ body {
     align-items: center;
 }
 
+.carrusel-contenedor {
+    display: grid;
+    grid-template-columns: auto 1fr auto;
+    gap: 20px;
+    align-items: center;
+}
+
+.carrusel-wrapper {
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+    align-items: center;
+}
+
 .lado {
     display: grid;
     gap: 16px;
@@ -143,6 +157,46 @@ body {
     box-shadow: 0 16px 28px rgba(233, 30, 99, 0.22);
 }
 
+.boton-carrusel {
+    width: 50px;
+    height: 50px;
+    border-radius: 50%;
+    border: none;
+    background: linear-gradient(135deg, #e91e63, #c2185b);
+    color: white;
+    font-size: 1.4rem;
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    transition: transform 0.25s ease, box-shadow 0.25s ease;
+    box-shadow: 0 8px 20px rgba(233, 30, 99, 0.25);
+}
+
+.boton-carrusel:hover {
+    transform: scale(1.08);
+    box-shadow: 0 12px 26px rgba(233, 30, 99, 0.35);
+}
+
+.boton-carrusel:active {
+    transform: scale(0.95);
+}
+
+.miniaturas-contenedor {
+    display: grid;
+    grid-template-columns: repeat(6, 1fr);
+    gap: 8px;
+    width: 100%;
+}
+
+.contador-fotos {
+    text-align: center;
+    color: #c2185b;
+    font-weight: 700;
+    font-size: 1rem;
+    margin-top: 16px;
+}
+
 .audio-panel p {
     color: #666;
     font-size: 0.96rem;
@@ -151,12 +205,17 @@ body {
 }
 
 @media (max-width: 900px) {
-    .galeria-grid {
+    .carrusel-contenedor {
         grid-template-columns: 1fr;
+        gap: 16px;
     }
 
-    .lado {
-        grid-template-columns: repeat(3, minmax(0, 1fr));
+    .boton-carrusel {
+        display: none;
+    }
+
+    .miniaturas-contenedor {
+        grid-template-columns: repeat(3, 1fr);
     }
 
     .mensaje-tactil {
@@ -165,13 +224,19 @@ body {
 }
 
 @media (max-width: 680px) {
-    .lado {
+    .miniaturas-contenedor {
         grid-template-columns: repeat(2, minmax(0, 1fr));
-        gap: 12px;
+        gap: 10px;
     }
 
     .imagen-principal {
-        min-height: 300px;
+        min-height: 280px;
+    }
+
+    .boton-carrusel {
+        width: 44px;
+        height: 44px;
+        font-size: 1.2rem;
     }
 }
 
@@ -183,5 +248,14 @@ body {
 
     .audio-panel {
         padding: 14px 16px;
+    }
+
+    .miniaturas-contenedor {
+        grid-template-columns: repeat(3, 1fr);
+        gap: 8px;
+    }
+
+    .contador-fotos {
+        font-size: 0.95rem;
     }
 }

@@ -10,36 +10,40 @@
     <div class="contenedor-galeria">
         <a href="index.html" class="boton-volver">← Volver</a>
 
-        <div class="galeria-grid">
-            <div class="lado lado-izquierdo">
-                <div class="miniatura" data-index="0">
-                    <img src="https://via.placeholder.com/180x140/FF69B4/FFFFFF?text=1" alt="Miniatura 1">
+        <div class="carrusel-contenedor">
+            <button class="boton-carrusel boton-izquierda" id="botonIzq">❮</button>
+            
+            <div class="carrusel-wrapper">
+                <div class="imagen-principal" id="imagenPrincipal">
+                    <img id="imagenPrincipalImg" src="https://via.placeholder.com/500x400/FF69B4/FFFFFF?text=Foto+1" alt="Imagen principal">
                 </div>
-                <div class="miniatura" data-index="1">
-                    <img src="https://via.placeholder.com/180x140/FFB6C1/FFFFFF?text=2" alt="Miniatura 2">
-                </div>
-                <div class="miniatura" data-index="2">
-                    <img src="https://via.placeholder.com/180x140/FFC0CB/FFFFFF?text=3" alt="Miniatura 3">
+                
+                <div class="miniaturas-contenedor">
+                    <div class="miniatura" data-index="0">
+                        <img src="https://via.placeholder.com/180x140/FF69B4/FFFFFF?text=1" alt="Miniatura 1">
+                    </div>
+                    <div class="miniatura" data-index="1">
+                        <img src="https://via.placeholder.com/180x140/FFB6C1/FFFFFF?text=2" alt="Miniatura 2">
+                    </div>
+                    <div class="miniatura" data-index="2">
+                        <img src="https://via.placeholder.com/180x140/FFC0CB/FFFFFF?text=3" alt="Miniatura 3">
+                    </div>
+                    <div class="miniatura" data-index="3">
+                        <img src="https://via.placeholder.com/180x140/FFE4E1/FFFFFF?text=4" alt="Miniatura 4">
+                    </div>
+                    <div class="miniatura" data-index="4">
+                        <img src="https://via.placeholder.com/180x140/E91E63/FFFFFF?text=5" alt="Miniatura 5">
+                    </div>
+                    <div class="miniatura" data-index="5">
+                        <img src="https://via.placeholder.com/180x140/C2185B/FFFFFF?text=6" alt="Miniatura 6">
+                    </div>
                 </div>
             </div>
-
-            <div class="imagen-principal" id="imagenPrincipal">
-                <img id="imagenPrincipalImg" src="https://via.placeholder.com/500x400/FF69B4/FFFFFF?text=Foto+1" alt="Imagen principal">
-                <div class="mensaje-tactil">Desliza con el dedo para girar y cambiar la imagen</div>
-            </div>
-
-            <div class="lado lado-derecho">
-                <div class="miniatura" data-index="3">
-                    <img src="https://via.placeholder.com/180x140/FFE4E1/FFFFFF?text=4" alt="Miniatura 4">
-                </div>
-                <div class="miniatura" data-index="4">
-                    <img src="https://via.placeholder.com/180x140/E91E63/FFFFFF?text=5" alt="Miniatura 5">
-                </div>
-                <div class="miniatura" data-index="5">
-                    <img src="https://via.placeholder.com/180x140/C2185B/FFFFFF?text=6" alt="Miniatura 6">
-                </div>
-            </div>
+            
+            <button class="boton-carrusel boton-derecha" id="botonDer">❯</button>
         </div>
+        
+        <div class="contador-fotos" id="contadorFotos">1 / 6</div>
 
         <div class="audio-panel">
             <button id="botonAudio" class="boton-audio">Activar audio</button>
@@ -60,9 +64,13 @@
         const imagenPrincipal = document.getElementById('imagenPrincipalImg');
         const imagenContenedor = document.getElementById('imagenPrincipal');
         const botonAudio = document.getElementById('botonAudio');
+        const botonIzq = document.getElementById('botonIzq');
+        const botonDer = document.getElementById('botonDer');
+        const contadorFotos = document.getElementById('contadorFotos');
         let indiceActual = 0;
         let startX = 0;
         let audioContext;
+        let animandoSwipe = false;
 
         function actualizarImagen(nuevoIndice) {
             indiceActual = (nuevoIndice + imagenes.length) % imagenes.length;
@@ -70,6 +78,7 @@
             miniaturas.forEach((mini, index) => {
                 mini.classList.toggle('activo', index === indiceActual);
             });
+            contadorFotos.textContent = (indiceActual + 1) + ' / ' + imagenes.length;
             if (audioContext) {
                 sonarNota(indiceActual);
             }
@@ -81,28 +90,40 @@
             });
         });
 
+        botonIzq.addEventListener('click', () => {
+            if (!animandoSwipe) actualizarImagen(indiceActual - 1);
+        });
+
+        botonDer.addEventListener('click', () => {
+            if (!animandoSwipe) actualizarImagen(indiceActual + 1);
+        });
+
         imagenContenedor.addEventListener('touchstart', e => {
             startX = e.changedTouches[0].clientX;
             imagenContenedor.style.transition = 'none';
-            imagenContenedor.classList.add('deslizando');
-        });
+        }, false);
 
         imagenContenedor.addEventListener('touchmove', e => {
             const deltaX = e.changedTouches[0].clientX - startX;
-            imagenContenedor.style.transform = `perspective(800px) rotateY(${deltaX / 8}deg)`;
-        });
+            const rotacion = deltaX / 12;
+            imagenContenedor.style.transform = `perspective(1000px) rotateY(${rotacion}deg) scale(${1 - Math.abs(deltaX) / 2000})`;
+        }, false);
 
         imagenContenedor.addEventListener('touchend', e => {
             const deltaX = e.changedTouches[0].clientX - startX;
-            imagenContenedor.style.transition = 'transform 0.35s ease';
-            imagenContenedor.style.transform = 'perspective(800px) rotateY(0deg)';
-            imagenContenedor.classList.remove('deslizando');
-            if (deltaX > 40) {
+            imagenContenedor.style.transition = 'transform 0.4s cubic-bezier(0.34, 1.56, 0.64, 1)';
+            imagenContenedor.style.transform = 'perspective(1000px) rotateY(0deg) scale(1)';
+            
+            if (deltaX > 50) {
+                animandoSwipe = true;
+                setTimeout(() => { animandoSwipe = false; }, 400);
                 actualizarImagen(indiceActual - 1);
-            } else if (deltaX < -40) {
+            } else if (deltaX < -50) {
+                animandoSwipe = true;
+                setTimeout(() => { animandoSwipe = false; }, 400);
                 actualizarImagen(indiceActual + 1);
             }
-        });
+        }, false);
 
         function iniciarAudio() {
             if (audioContext) return;
